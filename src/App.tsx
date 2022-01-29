@@ -1,13 +1,15 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import Router from "./Router";
 import { GlobalStyle } from "./css";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 function App() {
   return (
     <>
-      <GlobalStyle /> <Router />
+      <GlobalStyle />
+      <Router />
+      <ReactQueryDevtools initialIsOpen={true} />
     </>
   );
 }
