@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import { Helmet } from "react-helmet";
 import {
   Link,
   Route,
@@ -152,11 +152,23 @@ function Coin() {
    * react Query 는 각각의 고유한 ID 를 가지고 있어야 한다.
    * react Query 는 query 를 Array 로 보고있다.
    */
-  const {isLoading: infoLoading, data: infoData } = useQuery<IInfoData>(["info", coinId], () => fetchCoinInfo(coinId));
-  const {isLoading: tickerLoading, data: tickersData } = useQuery<IPriceData>(["tickers", coinId], () => fetchCoinTickers(coinId));
+  const { isLoading: infoLoading, data: infoData } = useQuery<IInfoData>(
+    ["info", coinId],
+    () => fetchCoinInfo(coinId)
+  );
+  const { isLoading: tickerLoading, data: tickersData } = useQuery<IPriceData>(
+    ["tickers", coinId],
+    () => fetchCoinTickers(coinId),
+    { refetchInterval: 5000 }
+  );
   const loading = infoLoading || tickerLoading;
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </title>
+      </Helmet>
       <Header>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
@@ -176,8 +188,8 @@ function Coin() {
               <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? "Yes" : "No"}</span>
+              <span>Price:</span>
+              <span>{tickersData?.quotes.USD.price.toFixed(3)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
@@ -200,11 +212,11 @@ function Coin() {
             </Tab>
           </Tabs>
           <Switch>
-            <Route path={`/${coinId}/price`}>
+            <Route path={`/:coinId/price`}>
               <Price />
             </Route>
-            <Route path={`/${coinId}/chart`}>
-              <Chart />
+            <Route path={`/:coinId/chart`}>
+              <Chart coinId={coinId} />
             </Route>
           </Switch>
         </>
